@@ -12,7 +12,7 @@ AnimatorStateTransition:
     m_ConditionEvent: IsTurn
     m_EventTreshold: 0
   - m_ConditionMode: 2
-    m_ConditionEvent: HasClickedTile
+    m_ConditionEvent: Jump
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 4207857962706972342}
@@ -43,7 +43,7 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
-  - m_Name: HasClickedTile
+  - m_Name: Jump
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -74,7 +74,7 @@ AnimatorStateTransition:
     m_ConditionEvent: IsTurn
     m_EventTreshold: 0
   - m_ConditionMode: 1
-    m_ConditionEvent: HasClickedTile
+    m_ConditionEvent: Jump
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 3677857666446500555}
