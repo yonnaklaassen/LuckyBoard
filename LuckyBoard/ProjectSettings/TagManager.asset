@@ -8,14 +8,15 @@ TagManager:
   - DamageTile
   - HealthTile
   - Enemy
+  - TeleportTile
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
+  - Enemy
   - 
   - 
   - 

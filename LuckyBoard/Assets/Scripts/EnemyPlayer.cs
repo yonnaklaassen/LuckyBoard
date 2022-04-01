@@ -2,47 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyPlayer : MonoBehaviour
+public class EnemyPlayer : Player
 {
-    [SerializeField]
-    private float speed = 0.0f;
-
     [HideInInspector]
     public bool isTurn = false;
-
-    public Animator animator;
-
-    [SerializeField]
-    private Route currentRoute;
-
-    [SerializeField]
-    private TurnController turnController;
 
     [HideInInspector]
     public int steps;
 
-    private bool rolledOne = false;
-    private bool isMoving = false;
-    private int routePosition;
-    private float health = 100f;
-
     // Update is called once per frame
    private void Update()
     {
-        if (!isMoving && isTurn)
+        if (isTurn && !isMoving)
         {
             steps = Random.Range(1, 7);
-            Debug.Log("Rolled: " + steps);
+            Debug.Log("Enemy Rolled: " + steps);
 
             if (routePosition + steps < currentRoute.tiles.Count)
             {
-                if (steps == 1)
-                {
-                    rolledOne = true;
-                }
-
-                animator.SetBool("Jump", true);
-                StartCoroutine(Move());
+                StartCoroutine(Move(steps, false));
             }
             else
             {
@@ -53,81 +31,81 @@ public class EnemyPlayer : MonoBehaviour
 
     //Tutorial followed:
     //https://www.youtube.com/watch?v=d1oSQdydJsM&list=WL&index=1&t=2194s
-    private IEnumerator Move()
-    {
-        if (isMoving)
-        {
-            yield break;
-        }
+    //private IEnumerator Move()
+    //{
+    //    if (isMoving)
+    //    {
+    //        yield break;
+    //    }
 
-        isMoving = true;
+    //    isMoving = true;
 
-        yield return new WaitForSeconds(1.15f);
+    //    yield return new WaitForSeconds(1.15f);
 
 
-        while (steps > 0)
-        {
-            //Prevent double jump
-            if (rolledOne)
-            {
-                animator.SetBool("Jump", false);
-            }
+    //    while (steps > 0)
+    //    {
+    //        Vector3 nextPos = currentRoute.tiles[routePosition + 1].position;
 
-            Debug.Log("steps" + steps);
+    //        while (MoveToNextTile(nextPos))
+    //        {
+    //            yield return null;
+    //        }
 
-            Vector3 nextPos = currentRoute.tiles[routePosition + 1].position;
+    //        yield return new WaitForSeconds(0.5f);
+    //        steps--;
+    //        routePosition++;
 
-            while (MoveToNextTile(nextPos))
-            {
-                yield return null;
-            }
+    //    }
 
-            yield return new WaitForSeconds(0.5f);
-            steps--;
-            routePosition++;
+    //    isMoving = false;
+    //    var currentPos = currentRoute.tiles[routePosition].tag;
+    //    checkCurrentTile(currentPos);
 
-            if (steps <= 1)
-            {
-                animator.SetBool("Jump", false);
-            }
+    //    turnController.EndTurnEnemy();
+    //    animator.SetBool("TakeDamage", false);
+    //}
 
-        }
+    //private bool MoveToNextTile(Vector3 nextTile)
+    //{
 
-        animator.SetBool("Jump", false);
-        isMoving = false;
+    //    return nextTile != (transform.position = Vector3.MoveTowards(transform.position, nextTile, speed * Time.deltaTime));
+    //}
 
-        turnController.EndTurnEnemy();
-    }
+    //private void checkCurrentTile(string currentPos)
+    //{
+    //    if (currentPos.Equals("DamageTile"))
+    //    {
+    //        loseHealth(health);
+    //        animator.Play("TakeDamage", -1, 0f);
+    //        FindObjectOfType<AudioManager>().Play("OnMainPlayerDamaged");
+    //    }
 
-    private bool MoveToNextTile(Vector3 nextTile)
-    {
+    //}
 
-        return nextTile != (transform.position = Vector3.MoveTowards(transform.position, nextTile, speed * Time.deltaTime));
-    }
+    //private void loseHealth(float damage)
+    //{
 
-    public void loseHealth(float damage)
-    {
+    //    if ((health - damage) < 0)
+    //    {
+    //        health = 0;
+    //    }
+    //    else
+    //    {
+    //        health -= damage;
+    //    }
+    //}
 
-        if ((health - damage) < 0)
-        {
-            health = 0;
-        }
-        else
-        {
-            health -= damage;
-        }
-    }
-
-    public void gainHealth(float healing)
-    {
-        if ((health + healing) > 100f)
-        {
-            health = 100f;
-        }
-        else
-        {
-            health += healing;
-        }
-    }
+    //private void gainHealth(float healing)
+    //{
+    //    if ((health + healing) > 100f)
+    //    {
+    //        health = 100f;
+    //    }
+    //    else
+    //    {
+    //        health += healing;
+    //    }
+    //}
 
 }

@@ -4,69 +4,29 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public Route currentRoute;
+
     [SerializeField]
-    private Rigidbody rb;
+    private TurnController turnController;
 
     [SerializeField]
     private float speed = 0.0f;
 
     public Animator animator;
-
-    [SerializeField]
-    private Route currentRoute;
-
-    [SerializeField]
-    private TurnController turnController;
+    public int routePosition = 0;
 
     [HideInInspector]
-    public int steps;
+    public bool isMoving = false;
 
-    [HideInInspector]
-    public bool isTurn = false;
+    [SerializeField]
+    private float health = 0f;
 
-    private bool rolledOne = false;
-    private bool isMoving = false;
-    private int routePosition;
-    private float health = 100f;
+    private string[] playerDamagedSounds = { "OnPlayerDamaged", "OnPlayerDamaged2", "OnPlayerDamaged3" };
+    private string[] happyPlayerSounds = { "OnPlayerHappy", "OnPlayerHappy2", "OnPlayerHappy3" };
 
-    private void Awake()
+    public IEnumerator Move(int steps, bool isMainPlayer)
     {
-        rb = GetComponent<Rigidbody>();
-        animator.SetBool("IsTurn", true);
-    }
 
-    void Start()
-    {
-        FindObjectOfType<AudioManager>().Play("OnMainPlayerTurn");
-    }
-
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Space) && !isMoving && isTurn)
-        {
-            steps = Random.Range(1, 7);
-            Debug.Log("Rolled: " + steps);
-
-            if(routePosition + steps < currentRoute.tiles.Count)
-            {
-                if(steps == 1)
-                {
-                    rolledOne = true;
-                }
-                animator.SetBool("Jump", true);
-                StartCoroutine(Move());
-
-            } else
-            {
-                Debug.Log("Rolled number too high");
-            }
-        }
-    }
-
-    //Tutorial followed:
-    //https://www.youtube.com/watch?v=d1oSQdydJsM&list=WL&index=1&t=2194s
-    private IEnumerator Move()
-    {
         if (isMoving)
         {
             yield break;
@@ -74,18 +34,11 @@ public class Player : MonoBehaviour
 
         isMoving = true;
 
-        yield return new WaitForSeconds(1.8f);
+        yield return new WaitForSeconds(1f);
 
         while (steps > 0)
         {
-            //Prevent double jump
-            if(rolledOne)
-            {
-                animator.SetBool("Jump", false);
-            }
-
-            Debug.Log("steps" + steps);
-
+            animator.Play("Jump", -1, 0f);
             Vector3 nextPos = currentRoute.tiles[routePosition + 1].position;
 
             while (MoveToNextTile(nextPos))
@@ -93,33 +46,64 @@ public class Player : MonoBehaviour
                 yield return null;
             }
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.4f);
             steps--;
             routePosition++;
-
-            if (steps <= 1)
-            {
-
-                animator.SetBool("Jump", false);
-            }
         }
 
-        animator.SetBool("Jump", false);
         isMoving = false;
+        var currentPos = currentRoute.tiles[routePosition].tag;
+        checkCurrentTile(currentPos);
 
-        turnController.EndTurnPlayer();
+        if(isMainPlayer)
+        {
+            turnController.EndTurnPlayer();
+        }
+        else
+        {
+            turnController.EndTurnEnemy();
+        }
+
     }
-     
+
+    public float GetCurrentHealth()
+    {
+        return health;
+    }
+
+    public int GetCurrentRoutePosition()
+    {
+        return routePosition;
+    }
+
     private bool MoveToNextTile(Vector3 nextTile)
     {
-        
+
         return nextTile != (transform.position = Vector3.MoveTowards(transform.position, nextTile, speed * Time.deltaTime));
     }
 
-    public void loseHealth(float damage)
+    private void checkCurrentTile(string currentPos)
     {
+        if (currentPos.Equals("DamageTile"))
+        {
+            loseHealth(health);
+            FindObjectOfType<AudioManager>().Play("Punch");
+            animator.Play("TakeDamage", -1, 0f);
+            FindObjectOfType<AudioManager>().Play(playerDamagedSounds[Random.Range(0, 2)]);
 
-        if((health - damage) < 0)
+        }
+        else if(currentPos.Equals("HealthTile"))
+        {
+            gainHealth(health);
+            animator.Play("GainHealth", -1, 0f);
+            FindObjectOfType<AudioManager>().Play(happyPlayerSounds[Random.Range(0, 2)]);
+        }
+
+    }
+
+    private void loseHealth(float damage)
+    {
+        if ((health - damage) < 0)
         {
             health = 0;
         }
@@ -129,9 +113,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void gainHealth(float healing)
+    private void gainHealth(float healing)
     {
-        if((health + healing) > 100f)
+        if ((health + healing) > 100f)
         {
             health = 100f;
         }
@@ -140,4 +124,5 @@ public class Player : MonoBehaviour
             health += healing;
         }
     }
+
 }

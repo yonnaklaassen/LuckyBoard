@@ -5,10 +5,12 @@ using UnityEngine;
 public class TurnController : MonoBehaviour
 {
     [SerializeField]
-    private Player player;
+    private MainPlayer player;
 
     [SerializeField]
     private EnemyPlayer enemyPlayer;
+
+    private string[] mainPlayerTurnPhrases = {"OnMainPlayerTurn", "OnMainPlayerTurn2" };
 
     private void Awake()
     {
@@ -31,5 +33,7 @@ public class TurnController : MonoBehaviour
 
         enemyPlayer.isTurn = false;
         enemyPlayer.animator.SetBool("IsTurn", false);
+
+        FindObjectOfType<AudioManager>().Play(mainPlayerTurnPhrases[Random.Range(0, 1)]);
     }
 }
