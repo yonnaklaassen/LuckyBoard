@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     public bool isMoving = false;
 
     [SerializeField]
-    private float health = 0f;
+    private int health = 0;
 
     private string[] playerDamagedSounds = { "OnPlayerDamaged", "OnPlayerDamaged2", "OnPlayerDamaged3" };
     private string[] happyPlayerSounds = { "OnPlayerHappy", "OnPlayerHappy2", "OnPlayerHappy3" };
@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
 
         while (steps > 0)
         {
-            animator.Play("Jump", -1, 0f);
+            animator.Play("Jump", -1, 2f);
             Vector3 nextPos = currentRoute.tiles[routePosition + 1].position;
 
             while (MoveToNextTile(nextPos))
@@ -66,7 +66,7 @@ public class Player : MonoBehaviour
 
     }
 
-    public float GetCurrentHealth()
+    public int GetCurrentHealth()
     {
         return health;
     }
@@ -86,7 +86,7 @@ public class Player : MonoBehaviour
     {
         if (currentPos.Equals("DamageTile"))
         {
-            loseHealth(health);
+            loseHealth(5);
             FindObjectOfType<AudioManager>().Play("Punch");
             animator.Play("TakeDamage", -1, 0f);
             FindObjectOfType<AudioManager>().Play(playerDamagedSounds[Random.Range(0, 2)]);
@@ -94,14 +94,14 @@ public class Player : MonoBehaviour
         }
         else if(currentPos.Equals("HealthTile"))
         {
-            gainHealth(health);
+            gainHealth(5);
             animator.Play("GainHealth", -1, 0f);
             FindObjectOfType<AudioManager>().Play(happyPlayerSounds[Random.Range(0, 2)]);
         }
 
     }
 
-    private void loseHealth(float damage)
+    private void loseHealth(int damage)
     {
         if ((health - damage) < 0)
         {
@@ -113,11 +113,11 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void gainHealth(float healing)
+    private void gainHealth(int healing)
     {
-        if ((health + healing) > 100f)
+        if ((health + healing) > 100)
         {
-            health = 100f;
+            health = 100;
         }
         else
         {
