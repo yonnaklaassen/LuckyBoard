@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -23,6 +24,7 @@ public class Player : MonoBehaviour
 
     private string[] playerDamagedSounds = { "OnPlayerDamaged", "OnPlayerDamaged2", "OnPlayerDamaged3" };
     private string[] happyPlayerSounds = { "OnPlayerHappy", "OnPlayerHappy2", "OnPlayerHappy3" };
+    private int[] turnLeftPositions = { 19, 36, 46 };
 
     public IEnumerator Move(int steps, bool isMainPlayer)
     {
@@ -38,7 +40,9 @@ public class Player : MonoBehaviour
 
         while (steps > 0)
         {
-            animator.Play("Jump", -1, 2f);
+            animator.Play("Jump", -1, 0f);
+
+            RotatePlayer(routePosition);
             Vector3 nextPos = currentRoute.tiles[routePosition + 1].position;
 
             while (MoveToNextTile(nextPos))
@@ -53,7 +57,7 @@ public class Player : MonoBehaviour
 
         isMoving = false;
         var currentPos = currentRoute.tiles[routePosition].tag;
-        checkCurrentTile(currentPos);
+        checkCurrentTile(currentPos, routePosition);
 
         if(isMainPlayer)
         {
@@ -82,11 +86,11 @@ public class Player : MonoBehaviour
         return nextTile != (transform.position = Vector3.MoveTowards(transform.position, nextTile, speed * Time.deltaTime));
     }
 
-    private void checkCurrentTile(string currentPos)
+    private void checkCurrentTile(string currentPos, int routePosition)
     {
         if (currentPos.Equals("DamageTile"))
         {
-            loseHealth(5);
+            LoseHealth(5);
             FindObjectOfType<AudioManager>().Play("Punch");
             animator.Play("TakeDamage", -1, 0f);
             FindObjectOfType<AudioManager>().Play(playerDamagedSounds[Random.Range(0, 2)]);
@@ -94,14 +98,61 @@ public class Player : MonoBehaviour
         }
         else if(currentPos.Equals("HealthTile"))
         {
-            gainHealth(5);
+            GainHealth(5);
             animator.Play("GainHealth", -1, 0f);
             FindObjectOfType<AudioManager>().Play(happyPlayerSounds[Random.Range(0, 2)]);
+        }
+        else if(currentPos.Equals("TeleportTile"))
+        {
+            TeleportPlayer(routePosition);
+            FindObjectOfType<AudioManager>().Play("Teleport");
         }
 
     }
 
-    private void loseHealth(int damage)
+    private void TeleportPlayer(int routePosition)
+    {
+        var nextTeleportTile = currentRoute.tiles.GetRange(routePosition + 1, currentRoute.tiles.Count - routePosition - 1).Find(t => t.tag.Equals("TeleportTile"));
+        var tilesBeforeCurrentPos = currentRoute.tiles.GetRange(0, routePosition);
+
+        tilesBeforeCurrentPos.Reverse();
+        var lastTeleportTile = tilesBeforeCurrentPos.Find(t => t.tag.Equals("TeleportTile"));
+
+        Transform teleportTo = transform;
+        if (lastTeleportTile != null && nextTeleportTile != null)
+        {
+            Transform[] options = { lastTeleportTile, nextTeleportTile };
+            teleportTo = options[Random.Range(0, 1)];
+
+            Debug.Log("Teleport to tile: " + teleportTo);
+        }
+        else if (lastTeleportTile != null && nextTeleportTile == null)
+        {
+            teleportTo = lastTeleportTile;
+
+            Debug.Log("Teleport to lastTile: " + teleportTo);
+        }
+        else if (lastTeleportTile == null && nextTeleportTile != null)
+        {
+            teleportTo = nextTeleportTile;
+
+            Debug.Log("Teleport to nextTile: " + teleportTo);
+        }
+
+        var newPosition = currentRoute.tiles.FindIndex(t => t == teleportTo);
+        routePosition = newPosition;
+        transform.position = teleportTo.position;
+    }
+
+    private void RotatePlayer(int routePosition)
+    {
+        if(turnLeftPositions.Contains(routePosition))
+        {
+            transform.Rotate(0f, -90.0f, 0f);
+        }
+    }
+
+    private void LoseHealth(int damage)
     {
         if ((health - damage) < 0)
         {
@@ -113,7 +164,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void gainHealth(int healing)
+    private void GainHealth(int healing)
     {
         if ((health + healing) > 100)
         {

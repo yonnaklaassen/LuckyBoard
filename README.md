@@ -23,5 +23,5 @@ https://www.youtube.com/watch?v=6OT43pvUyfY
 UI MainMenu:
 https://www.youtube.com/watch?v=zc8ac_qUXQY
 
-Coroutine in Player script:
+Route and Coroutine in Player script:
 https://www.youtube.com/watch?v=d1oSQdydJsM&list=WL&index=1&t=2194s
