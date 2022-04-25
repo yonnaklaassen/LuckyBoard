@@ -24,9 +24,15 @@ public class UIController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI enemyHealthValue;
 
+    [SerializeField]
+    private TextMeshProUGUI infoText;
+
+    private GameObject rollButton;
+
 
     void Start()
     {
+        rollButton = GameObject.FindGameObjectWithTag("RollButton");
         playerHealthBar.value = mainPlayer.GetCurrentHealth();
         enemyHealthBar.value = enemyPlayer.GetCurrentHealth();
 
@@ -41,5 +47,22 @@ public class UIController : MonoBehaviour
 
         playerHealthValue.text = mainPlayer.GetCurrentHealth().ToString();
         enemyHealthValue.text = enemyPlayer.GetCurrentHealth().ToString();
+    }
+
+    public void UpdateInfoText(int value, bool isDamage)
+    {
+        if(isDamage)
+        {
+            infoText.text = "You took " + value + " damage!";
+        }
+        else
+        {
+            infoText.text = "You gained " + value + " health!";
+        }
+    }
+
+    public void SetRollButton(bool active)
+    {
+        rollButton.SetActive(active);
     }
 }

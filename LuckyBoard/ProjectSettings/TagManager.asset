@@ -9,6 +9,7 @@ TagManager:
   - HealthTile
   - Enemy
   - TeleportTile
+  - RollButton
   layers:
   - Default
   - TransparentFX

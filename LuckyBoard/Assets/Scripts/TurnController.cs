@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TurnController : MonoBehaviour
 {
@@ -9,6 +10,9 @@ public class TurnController : MonoBehaviour
 
     [SerializeField]
     private EnemyPlayer enemyPlayer;
+
+    [SerializeField]
+    private UIController uiController;
 
     private string[] mainPlayerTurnPhrases = {"OnMainPlayerTurn", "OnMainPlayerTurn2" };
 
@@ -24,6 +28,8 @@ public class TurnController : MonoBehaviour
 
         enemyPlayer.isTurn = true;
         enemyPlayer.animator.SetBool("IsTurn", true);
+
+        uiController.SetRollButton(false);
     }
 
     public void EndTurnEnemy()
@@ -34,6 +40,7 @@ public class TurnController : MonoBehaviour
         enemyPlayer.isTurn = false;
         enemyPlayer.animator.SetBool("IsTurn", false);
 
-        FindObjectOfType<AudioManager>().Play(mainPlayerTurnPhrases[Random.Range(0, 1)]);
+        FindObjectOfType<AudioManager>().Play(mainPlayerTurnPhrases[Random.Range(0, 3)]);
+        uiController.SetRollButton(true);
     }
 }
