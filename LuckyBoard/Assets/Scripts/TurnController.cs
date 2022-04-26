@@ -20,27 +20,21 @@ public class TurnController : MonoBehaviour
 
     private void Awake()
     {
-        player.isTurn = true;
         audioManager = FindObjectOfType<AudioManager>();
     }
 
     public void EndTurnPlayer()
     {
-        player.isTurn = false;
         player.animator.SetBool("IsTurn", false);
-
-        enemyPlayer.isTurn = true;
         enemyPlayer.animator.SetBool("IsTurn", true);
 
+        enemyPlayer.Roll(false);
         uiController.SetRollButton(false);
     }
 
     public void EndTurnEnemy()
     {
-        player.isTurn = true;
         player.animator.SetBool("IsTurn", true);
-
-        enemyPlayer.isTurn = false;
         enemyPlayer.animator.SetBool("IsTurn", false);
 
         audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);

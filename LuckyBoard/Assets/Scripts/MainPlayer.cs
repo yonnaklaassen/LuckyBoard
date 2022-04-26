@@ -5,12 +5,6 @@ using UnityEngine.UI;
 
 public class MainPlayer : Player
 {
-    [HideInInspector]
-    private int steps;
-
-    [HideInInspector]
-    public bool isTurn = false;
-
     void Start()
     {
         audioManager.Play("OnMainPlayerTurn");
@@ -18,25 +12,16 @@ public class MainPlayer : Player
 
     private void OnEnable()
     {
-        UIController.rolled += RollButtonClicked;
+        UIController.rolled += PlayerRoll;
     }
 
     private void OnDisable()
     {
-        UIController.rolled -= RollButtonClicked;
+        UIController.rolled -= PlayerRoll;
     }
 
-    private void RollButtonClicked()
+    public void PlayerRoll()
     {
-        if(isTurn && !isMoving)
-        {
-            audioManager.Play("DiceRoll");
-            steps = Random.Range(1, 7);
-
-            if(routePosition + steps < currentRoute.tiles.Count)
-            {
-                StartCoroutine(Move(steps, true));
-            }
-        }
+        Roll(true);
     }
 }

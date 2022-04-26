@@ -36,6 +36,16 @@ public class Player : MonoBehaviour
     {
         audioManager = FindObjectOfType<AudioManager>();
     }
+    public void Roll(bool isMainPlayer)
+    {
+        audioManager.Play("DiceRoll");
+        int steps = Random.Range(1, 7);
+
+        if (routePosition + steps < currentRoute.tiles.Count)
+         {
+            StartCoroutine(Move(steps, isMainPlayer));
+         }
+    }
 
     public IEnumerator Move(int steps, bool isMainPlayer)
     {
