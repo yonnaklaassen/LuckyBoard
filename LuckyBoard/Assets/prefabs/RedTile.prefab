@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 8392930255197579467}
   - component: {fileID: 8392930255197579466}
   - component: {fileID: 3859633927235046070}
-  - component: {fileID: -5650794195076817552}
   m_Layer: 0
   m_Name: RedTile
   m_TagString: DamageTile
@@ -111,17 +110,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 10, y: 0.1, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-5650794195076817552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1263173408383279842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b45cbd6d46e89d409a0d7bf33b6c700, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  healthLoss: 5

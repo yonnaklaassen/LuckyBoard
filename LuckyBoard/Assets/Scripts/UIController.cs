@@ -27,12 +27,21 @@ public class UIController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI infoText;
 
-    private GameObject rollButton;
+    private GameObject rollButtonObject;
+
+    [SerializeField]
+    private Button rollButton;
+
+    [SerializeField]
+    private TextMeshProUGUI rollValueText;
+
+    public delegate void RollButtonClicked();
+    public static event RollButtonClicked rolled;
 
 
     void Start()
     {
-        rollButton = GameObject.FindGameObjectWithTag("RollButton");
+        rollButtonObject = GameObject.FindGameObjectWithTag("RollButton");
         playerHealthBar.value = mainPlayer.GetCurrentHealth();
         enemyHealthBar.value = enemyPlayer.GetCurrentHealth();
 
@@ -41,7 +50,9 @@ public class UIController : MonoBehaviour
     }
 
     void Update()
-    {
+    { 
+        rollButton.onClick.AddListener(() => rolled());
+
         playerHealthBar.value = mainPlayer.GetCurrentHealth();
         enemyHealthBar.value = enemyPlayer.GetCurrentHealth();
 
@@ -49,20 +60,50 @@ public class UIController : MonoBehaviour
         enemyHealthValue.text = enemyPlayer.GetCurrentHealth().ToString();
     }
 
-    public void UpdateInfoText(int value, bool isDamage)
+    public void UpdateInfoText(int value, TileTypes type, bool isMainPlayer)
     {
-        if(isDamage)
+        infoText.enabled = true;
+        if(isMainPlayer && type == TileTypes.RedTile)
         {
-            infoText.text = "You took " + value + " damage!";
+            infoText.text = "You took " + value + " amount of damage!";
+            Invoke("DisableInfoText", 3);
+        }
+        else if(!isMainPlayer && type == TileTypes.RedTile)
+        {
+            infoText.text = "The enemy took " + value + " amount of damage!";
+            Invoke("DisableInfoText", 3);
+        }
+        else if(isMainPlayer && type == TileTypes.GreenTile)
+        {
+            infoText.text = "You gained " + value + " amount of health!";
+            Invoke("DisableInfoText", 3);
+        }
+        else if(!isMainPlayer && type == TileTypes.GreenTile)
+        {
+            infoText.text = "The enemy gained " + value + " amount of health!";
+            Invoke("DisableInfoText", 3);
+        }
+    }
+
+    public void DisplayRolledValue(int rollValue, bool isMainPlayer)
+    {
+        if (isMainPlayer)
+        {
+            rollValueText.text = "You rolled: " + rollValue.ToString();
         }
         else
         {
-            infoText.text = "You gained " + value + " health!";
+            rollValueText.text = "Enemy player rolled: " + rollValue.ToString();
         }
+    }
+
+    private void DisableInfoText()
+    {
+        infoText.enabled = false;
     }
 
     public void SetRollButton(bool active)
     {
-        rollButton.SetActive(active);
+        rollButtonObject.SetActive(active);
     }
 }

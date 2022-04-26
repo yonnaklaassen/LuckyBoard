@@ -14,11 +14,14 @@ public class TurnController : MonoBehaviour
     [SerializeField]
     private UIController uiController;
 
+    private AudioManager audioManager;
+
     private string[] mainPlayerTurnPhrases = {"OnMainPlayerTurn", "OnMainPlayerTurn2" };
 
     private void Awake()
     {
         player.isTurn = true;
+        audioManager = FindObjectOfType<AudioManager>();
     }
 
     public void EndTurnPlayer()
@@ -40,7 +43,7 @@ public class TurnController : MonoBehaviour
         enemyPlayer.isTurn = false;
         enemyPlayer.animator.SetBool("IsTurn", false);
 
-        FindObjectOfType<AudioManager>().Play(mainPlayerTurnPhrases[Random.Range(0, 3)]);
+        audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);
         uiController.SetRollButton(true);
     }
 }

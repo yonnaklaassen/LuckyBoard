@@ -15,7 +15,7 @@ Lowpoly Environment - Nature pack:
 https://assetstore.unity.com/packages/3d/environments/lowpoly-environment-nature-pack-free-187052
 
 
-Tutorials followed:
+Tutorials used:
 
 Audio manager:
 https://www.youtube.com/watch?v=6OT43pvUyfY
@@ -23,5 +23,11 @@ https://www.youtube.com/watch?v=6OT43pvUyfY
 UI MainMenu:
 https://www.youtube.com/watch?v=zc8ac_qUXQY
 
-Route and Coroutine in Player script:
+Route class and parts of Coroutine in Player script:
 https://www.youtube.com/watch?v=d1oSQdydJsM&list=WL&index=1&t=2194s
+
+
+Sound effects from:
+https://www.myinstants.com/index/dk/
+
+

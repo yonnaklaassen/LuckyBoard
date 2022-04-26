@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class Route : MonoBehaviour
 {
-    //Tutorial followed:
-    //https://www.youtube.com/watch?v=d1oSQdydJsM&list=WL&index=1&t=2194s
-
     private Transform[] childObjects;
     public List<Transform> tiles = new List<Transform>();
 

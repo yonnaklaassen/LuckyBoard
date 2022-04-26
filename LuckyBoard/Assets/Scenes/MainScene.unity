@@ -2138,6 +2138,16 @@ MonoBehaviour:
     volume: 0.5
     pitch: 1
     source: {fileID: 0}
+  - name: Heal
+    clip: {fileID: 8300000, guid: db781c60b3e78154489540c2a0127b75, type: 3}
+    volume: 0.5
+    pitch: 1
+    source: {fileID: 0}
+  - name: DiceRoll
+    clip: {fileID: 8300000, guid: 2ff85e9faf3c84f4cb595dc6310c58f5, type: 3}
+    volume: 0.9
+    pitch: 1
+    source: {fileID: 0}
 --- !u!4 &317982041
 Transform:
   m_ObjectHideFlags: 0
@@ -3812,11 +3822,9 @@ MonoBehaviour:
   routePosition: 0
   isMoving: 0
   health: 100
-  rollValueText: {fileID: 342009470}
   uiController: {fileID: 1574938563}
-  steps: 0
+  audioManager: {fileID: 0}
   isTurn: 0
-  rollButton: {fileID: 244277040}
 --- !u!54 &605728037
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3994,10 +4002,9 @@ MonoBehaviour:
   routePosition: 0
   isMoving: 0
   health: 100
-  rollValueText: {fileID: 342009470}
   uiController: {fileID: 1574938563}
+  audioManager: {fileID: 0}
   isTurn: 0
-  steps: 0
 --- !u!95 &664948319 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 9590100, guid: 7dc923b4c4812f147ba42a507e5507bd, type: 3}
@@ -10837,8 +10844,8 @@ MonoBehaviour:
   routePosition: 0
   isMoving: 0
   health: 0
-  rollValueText: {fileID: 342009470}
   uiController: {fileID: 1574938563}
+  audioManager: {fileID: 0}
 --- !u!4 &1546616207
 Transform:
   m_ObjectHideFlags: 0
@@ -11169,6 +11176,8 @@ MonoBehaviour:
   playerHealthValue: {fileID: 308257020}
   enemyHealthValue: {fileID: 1104066741}
   infoText: {fileID: 2061793453}
+  rollButton: {fileID: 244277040}
+  rollValueText: {fileID: 342009470}
 --- !u!1001 &1575078153
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14031,8 +14040,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 0, y: 95}
+  m_SizeDelta: {x: 500, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2061793453
 MonoBehaviour:

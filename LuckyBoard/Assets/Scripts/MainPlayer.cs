@@ -6,41 +6,36 @@ using UnityEngine.UI;
 public class MainPlayer : Player
 {
     [HideInInspector]
-    public int steps;
+    private int steps;
 
     [HideInInspector]
     public bool isTurn = false;
 
-    [SerializeField]
-    private Button rollButton;
-
     void Start()
     {
-        FindObjectOfType<AudioManager>().Play("OnMainPlayerTurn");
-        rollButton.onClick.AddListener(RollButtonClicked);
+        audioManager.Play("OnMainPlayerTurn");
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && isTurn && !isMoving)
-        {
-            RollButtonClicked();
-        }
+        UIController.rolled += RollButtonClicked;
+    }
+
+    private void OnDisable()
+    {
+        UIController.rolled -= RollButtonClicked;
     }
 
     private void RollButtonClicked()
     {
         if(isTurn && !isMoving)
         {
+            audioManager.Play("DiceRoll");
             steps = Random.Range(1, 7);
-            Debug.Log("Main player Rolled: " + steps);
 
             if(routePosition + steps < currentRoute.tiles.Count)
             {
                 StartCoroutine(Move(steps, true));
-            } else
-            {
-                Debug.Log("Rolled number too high");
             }
         }
     }

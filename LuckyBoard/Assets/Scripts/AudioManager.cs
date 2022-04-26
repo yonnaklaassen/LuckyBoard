@@ -6,13 +6,9 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    //From video https://www.youtube.com/watch?v=6OT43pvUyfY
-
     public Sound[] sounds;
 
     public static AudioManager instance;
-
-    // Start is called before the first frame update
     void Awake()
     {
         if(instance == null)
