@@ -6,27 +6,31 @@ using TMPro;
 
 public class Player : MonoBehaviour
 {
-    public Route currentRoute;
-
     [SerializeField]
-    private TurnController turnController;
+    private Route currentRoute;
 
     [SerializeField]
     private float speed = 0.0f;
 
-    public Animator animator;
+    [HideInInspector]
     public int routePosition = 0;
 
-    [HideInInspector]
-    public bool isMoving = false;
+    private bool isMoving = false;
 
     [SerializeField]
     private int health = 0;
 
-    [SerializeField]
-    private UIController uiController;
+    public delegate void UpdatePlayerInfoText(int value, TileTypes type, bool isMainPlayer, int health);
+    public static event UpdatePlayerInfoText updatePlayerInfo;
+
+    public delegate void DisplayRolledValue(int steps, bool isMainPlayer);
+    public static event DisplayRolledValue displayRolledValue;
+
+    public delegate void EndPlayerTurn(bool isMainPlayer);
+    public static event EndPlayerTurn endPlayerTurn;
 
     public AudioManager audioManager;
+    public Animator animator;
 
     private string[] playerDamagedSounds = { "OnPlayerDamaged", "OnPlayerDamaged2", "OnPlayerDamaged3" };
     private string[] happyPlayerSounds = { "OnPlayerHappy", "OnPlayerHappy2", "OnPlayerHappy3" };
@@ -54,7 +58,10 @@ public class Player : MonoBehaviour
             yield break;
         }
 
-       uiController.DisplayRolledValue(steps, isMainPlayer);
+        if(displayRolledValue != null)
+        {
+            displayRolledValue(steps, isMainPlayer);
+        }
 
         isMoving = true;
 
@@ -81,25 +88,10 @@ public class Player : MonoBehaviour
         var currentPos = currentRoute.tiles[routePosition].tag;
         checkCurrentTile(currentPos, routePosition, isMainPlayer);
 
-        if(isMainPlayer)
+        if(endPlayerTurn != null)
         {
-            turnController.EndTurnPlayer();
+            endPlayerTurn(isMainPlayer);
         }
-        else
-        {
-            turnController.EndTurnEnemy();
-        }
-
-    }
-
-    public int GetCurrentHealth()
-    {
-        return health;
-    }
-
-    public int GetCurrentRoutePosition()
-    {
-        return routePosition;
     }
 
     private bool MoveToNextTile(Vector3 nextTile)
@@ -183,9 +175,12 @@ public class Player : MonoBehaviour
             health -= damage;
         }
 
-        uiController.UpdateInfoText(damage, TileTypes.RedTile, isMainPlayer);
         animator.Play("TakeDamage");
         audioManager.Play(playerDamagedSounds[Random.Range(0, 3)]);
+        if (updatePlayerInfo != null)
+        {
+            updatePlayerInfo(damage, TileTypes.RedTile, isMainPlayer, health);
+        }
     }
 
     private void GainHealth(bool isMainPlayer)
@@ -200,9 +195,14 @@ public class Player : MonoBehaviour
         {
             health += healing;
         }
-        uiController.UpdateInfoText(healing, TileTypes.GreenTile, isMainPlayer);
+
         animator.Play("GainHealth");
         audioManager.Play(happyPlayerSounds[Random.Range(0, 3)]);
+
+        if(updatePlayerInfo != null)
+        {
+            updatePlayerInfo(healing, TileTypes.GreenTile, isMainPlayer, health);
+        }
     }
 
 }

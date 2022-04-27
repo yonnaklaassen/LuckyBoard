@@ -13,12 +13,6 @@ public class UIController : MonoBehaviour
     private Slider enemyHealthBar;
 
     [SerializeField]
-    private MainPlayer mainPlayer;
-
-    [SerializeField]
-    private EnemyPlayer enemyPlayer;
-
-    [SerializeField]
     private TextMeshProUGUI playerHealthValue;
 
     [SerializeField]
@@ -35,33 +29,34 @@ public class UIController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI rollValueText;
 
+    private int startHealth = 100;
+
     public delegate void RollButtonClicked();
     public static event RollButtonClicked rolled;
 
-
-    void Start()
+    private void Awake()
     {
         rollButtonObject = GameObject.FindGameObjectWithTag("RollButton");
-        playerHealthBar.value = mainPlayer.GetCurrentHealth();
-        enemyHealthBar.value = enemyPlayer.GetCurrentHealth();
-
-        playerHealthValue.text = mainPlayer.GetCurrentHealth().ToString();
-        enemyHealthValue.text = enemyPlayer.GetCurrentHealth().ToString();
     }
-
-    void Update()
-    { 
-        rollButton.onClick.AddListener(() => rolled());
-
-        playerHealthBar.value = mainPlayer.GetCurrentHealth();
-        enemyHealthBar.value = enemyPlayer.GetCurrentHealth();
-
-        playerHealthValue.text = mainPlayer.GetCurrentHealth().ToString();
-        enemyHealthValue.text = enemyPlayer.GetCurrentHealth().ToString();
-    }
-
-    public void UpdateInfoText(int value, TileTypes type, bool isMainPlayer)
+    void Start()
     {
+        playerHealthBar.value = startHealth;
+        enemyHealthBar.value = startHealth;
+
+        playerHealthValue.text = startHealth.ToString();
+        enemyHealthValue.text = startHealth.ToString();
+
+        rollButton.onClick.AddListener(() => {
+            if (rolled != null)
+            {
+                rolled();
+            }
+        });
+    }
+
+    public void UpdateInfoText(int value, TileTypes type, bool isMainPlayer, int health)
+    {
+        UpdateHealthStats(isMainPlayer, health);
         infoText.enabled = true;
         if(isMainPlayer && type == TileTypes.RedTile)
         {
@@ -85,6 +80,20 @@ public class UIController : MonoBehaviour
         }
     }
 
+    private void UpdateHealthStats(bool isMainPlayer, int health)
+    {
+        if(isMainPlayer)
+        {
+            playerHealthBar.value = health;
+            playerHealthValue.text = health.ToString();
+        }
+        else
+        {
+            enemyHealthBar.value = health;
+            enemyHealthValue.text = health.ToString();
+        }
+    }
+
     public void DisplayRolledValue(int rollValue, bool isMainPlayer)
     {
         if (isMainPlayer)
@@ -105,5 +114,19 @@ public class UIController : MonoBehaviour
     public void SetRollButton(bool active)
     {
         rollButtonObject.SetActive(active);
+    }
+
+    private void OnEnable()
+    {
+        TurnController.setRollButton += SetRollButton;
+        Player.updatePlayerInfo += UpdateInfoText;
+        Player.displayRolledValue += DisplayRolledValue;
+    }
+
+    private void OnDisable()
+    {
+        TurnController.setRollButton -= SetRollButton;
+        Player.updatePlayerInfo -= UpdateInfoText;
+        Player.displayRolledValue -= DisplayRolledValue;
     }
 }

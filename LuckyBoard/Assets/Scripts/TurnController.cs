@@ -11,33 +11,49 @@ public class TurnController : MonoBehaviour
     [SerializeField]
     private EnemyPlayer enemyPlayer;
 
-    [SerializeField]
-    private UIController uiController;
-
     private AudioManager audioManager;
 
     private string[] mainPlayerTurnPhrases = {"OnMainPlayerTurn", "OnMainPlayerTurn2" };
+
+    public delegate void SetRollButtonActive(bool active);
+    public static event SetRollButtonActive setRollButton;
 
     private void Awake()
     {
         audioManager = FindObjectOfType<AudioManager>();
     }
 
-    public void EndTurnPlayer()
+    private void EndTurn(bool isMainPlayer)
     {
-        player.animator.SetBool("IsTurn", false);
-        enemyPlayer.animator.SetBool("IsTurn", true);
+        if(isMainPlayer)
+        {
+            player.animator.SetBool("IsTurn", false);
+            enemyPlayer.animator.SetBool("IsTurn", true);
 
-        enemyPlayer.Roll(false);
-        uiController.SetRollButton(false);
+            enemyPlayer.Roll(false);
+        }
+        else
+        {
+            player.animator.SetBool("IsTurn", true);
+            enemyPlayer.animator.SetBool("IsTurn", false);
+            Debug.Log("Play");
+            audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);
+        }
+
+        if (setRollButton != null)
+        {
+            setRollButton(!isMainPlayer);
+        }
     }
 
-    public void EndTurnEnemy()
+    private void OnEnable()
     {
-        player.animator.SetBool("IsTurn", true);
-        enemyPlayer.animator.SetBool("IsTurn", false);
-
-        audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);
-        uiController.SetRollButton(true);
+        Player.endPlayerTurn += EndTurn;
     }
+
+    private void OnDisable()
+    {
+        Player.endPlayerTurn -= EndTurn;
+    }
+
 }
