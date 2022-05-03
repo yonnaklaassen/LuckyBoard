@@ -18,6 +18,9 @@ public class TurnController : MonoBehaviour
     public delegate void SetRollButtonActive(bool active);
     public static event SetRollButtonActive setRollButton;
 
+    public delegate void SetCameraPosition(bool isMainPlayer);
+    public static event SetCameraPosition setMainCamera;
+
     private void Awake()
     {
         audioManager = FindObjectOfType<AudioManager>();
@@ -36,13 +39,17 @@ public class TurnController : MonoBehaviour
         {
             player.animator.SetBool("IsTurn", true);
             enemyPlayer.animator.SetBool("IsTurn", false);
-            Debug.Log("Play");
             audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);
         }
 
         if (setRollButton != null)
         {
             setRollButton(!isMainPlayer);
+        }
+
+        if(setMainCamera != null)
+        {
+            setMainCamera(!isMainPlayer);
         }
     }
 

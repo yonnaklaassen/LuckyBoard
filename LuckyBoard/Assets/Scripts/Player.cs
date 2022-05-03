@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     public int routePosition = 0;
 
     private bool isMoving = false;
+    private bool isMainPlayer = false;
 
     [SerializeField]
     private int health = 0;
@@ -40,6 +41,11 @@ public class Player : MonoBehaviour
     {
         audioManager = FindObjectOfType<AudioManager>();
     }
+
+    private void Start()
+    {
+        isMainPlayer = true;
+    }
     public void Roll(bool isMainPlayer)
     {
         audioManager.Play("DiceRoll");
@@ -53,6 +59,7 @@ public class Player : MonoBehaviour
 
     public IEnumerator Move(int steps, bool isMainPlayer)
     {
+        this.isMainPlayer = isMainPlayer;
         if (isMoving)
         {
             yield break;
@@ -86,12 +93,24 @@ public class Player : MonoBehaviour
 
         isMoving = false;
         var currentPos = currentRoute.tiles[routePosition].tag;
-        checkCurrentTile(currentPos, routePosition, isMainPlayer);
+        var wait = checkCurrentTile(currentPos, routePosition, isMainPlayer);
 
         if(endPlayerTurn != null)
         {
-            endPlayerTurn(isMainPlayer);
+          if(wait)
+            {
+                Invoke("EndTurn", 2f);
+            }
+          else
+            {
+                EndTurn();
+            }
         }
+    }
+
+    private void EndTurn()
+    {
+        endPlayerTurn(this.isMainPlayer);
     }
 
     private bool MoveToNextTile(Vector3 nextTile)
@@ -100,23 +119,27 @@ public class Player : MonoBehaviour
         return nextTile != (transform.position = Vector3.MoveTowards(transform.position, nextTile, speed * Time.deltaTime));
     }
 
-    private void checkCurrentTile(string currentPos, int routePosition, bool isMainPlayer)
+    private bool checkCurrentTile(string currentPos, int routePosition, bool isMainPlayer)
     {
+        var wait = false;
         if (currentPos.Equals("DamageTile"))
         {
             LoseHealth(isMainPlayer);
+            wait = true;
         }
         else if(currentPos.Equals("HealthTile"))
         {
             GainHealth(isMainPlayer);
+            wait = true;
 
         }
         else if(currentPos.Equals("TeleportTile"))
         {
             audioManager.Play("Teleport");
             TeleportPlayer(routePosition);
+            wait = true;
         }
-
+        return wait;
     }
 
     private void TeleportPlayer(int routePosition)
@@ -156,7 +179,7 @@ public class Player : MonoBehaviour
 
     private void RotatePlayer(int routePosition)
     {
-        if(turnLeftPositions.Contains(routePosition))
+        if(routePosition >= turnLeftPositions[0])
         {
             transform.Rotate(0f, -90.0f, 0f);
         }
@@ -164,7 +187,7 @@ public class Player : MonoBehaviour
 
     private void LoseHealth(bool isMainPlayer)
     {
-        int damage = Random.Range(0, 11);
+        int damage = Random.Range(1, 11);
         audioManager.Play("Punch");
         if ((health - damage) < 0)
         {
@@ -185,7 +208,7 @@ public class Player : MonoBehaviour
 
     private void GainHealth(bool isMainPlayer)
     {
-        int healing = Random.Range(0, 11);
+        int healing = Random.Range(1, 11);
         audioManager.Play("Heal");
         if ((health + healing) > 100)
         {
