@@ -61,22 +61,22 @@ public class UIController : MonoBehaviour
         if(isMainPlayer && type == TileTypes.RedTile)
         {
             infoText.text = "You took " + value + " amount of damage!";
-            Invoke("DisableInfoText", 3);
+            Invoke("DisableInfoText", 2.5f);
         }
         else if(!isMainPlayer && type == TileTypes.RedTile)
         {
             infoText.text = "The enemy took " + value + " amount of damage!";
-            Invoke("DisableInfoText", 3);
+            Invoke("DisableInfoText", 2.5f);
         }
         else if(isMainPlayer && type == TileTypes.GreenTile)
         {
             infoText.text = "You gained " + value + " amount of health!";
-            Invoke("DisableInfoText", 3);
+            Invoke("DisableInfoText", 2.5f);
         }
         else if(!isMainPlayer && type == TileTypes.GreenTile)
         {
             infoText.text = "The enemy gained " + value + " amount of health!";
-            Invoke("DisableInfoText", 3);
+            Invoke("DisableInfoText", 2.5f);
         }
     }
 

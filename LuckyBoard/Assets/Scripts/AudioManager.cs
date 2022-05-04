@@ -29,6 +29,7 @@ public class AudioManager : MonoBehaviour
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
             s.source.playOnAwake = false;
+            s.source.volume = s.volume;
         }
     }
 

@@ -12,6 +12,8 @@ public class MainCameraController : MonoBehaviour
 
     private AudioManager audioManager;
 
+    private float cameraDistance = 4f;
+
     private void Awake()
     {
         mainPlayer = GameObject.FindGameObjectWithTag("Player");
@@ -28,11 +30,15 @@ public class MainCameraController : MonoBehaviour
     {
         if(followMainPlayer)
         {
-            transform.position = mainPlayer.transform.position + new Vector3(4, 2.5f, 0);
+            transform.position = mainPlayer.transform.position - mainPlayer.transform.forward * cameraDistance;
+            transform.LookAt(mainPlayer.transform.position);
+            transform.position = new Vector3(transform.position.x, transform.position.y + 2.5f, transform.position.z);
         }
         else
         {
-            transform.position = enemyPlayer.transform.position + new Vector3(4, 2.5f, 0);
+            transform.position = enemyPlayer.transform.position - enemyPlayer.transform.forward * cameraDistance;
+            transform.LookAt(enemyPlayer.transform.position);
+            transform.position = new Vector3(transform.position.x, transform.position.y + 2.5f, transform.position.z);
         }
 
     }

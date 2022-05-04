@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
 
     private string[] playerDamagedSounds = { "OnPlayerDamaged", "OnPlayerDamaged2", "OnPlayerDamaged3" };
     private string[] happyPlayerSounds = { "OnPlayerHappy", "OnPlayerHappy2", "OnPlayerHappy3" };
-    private int[] turnLeftPositions = { 19, 36, 46 };
+    private int[] turnLeftPositions = { 19, 36};
 
     public void Awake()
     {
@@ -179,9 +179,17 @@ public class Player : MonoBehaviour
 
     private void RotatePlayer(int routePosition)
     {
-        if(routePosition >= turnLeftPositions[0])
+        if(routePosition < turnLeftPositions[0])
         {
-            transform.Rotate(0f, -90.0f, 0f);
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -90, transform.rotation.z));
+        }
+        else if(routePosition >= turnLeftPositions[0] && routePosition < turnLeftPositions[1])
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -180, transform.rotation.z));
+        }
+        else if(routePosition >= turnLeftPositions[1])
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -270, transform.rotation.z));
         }
     }
 
