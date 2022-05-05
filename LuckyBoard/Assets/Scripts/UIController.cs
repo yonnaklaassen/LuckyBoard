@@ -38,6 +38,7 @@ public class UIController : MonoBehaviour
     {
         rollButtonObject = GameObject.FindGameObjectWithTag("RollButton");
     }
+
     void Start()
     {
         playerHealthBar.value = startHealth;
@@ -54,28 +55,37 @@ public class UIController : MonoBehaviour
         });
     }
 
-    public void UpdateInfoText(int value, TileTypes type, bool isMainPlayer, int health)
+    public void UpdateInfoText(int value, TileType type, bool isMainPlayer, int health)
     {
         UpdateHealthStats(isMainPlayer, health);
         infoText.enabled = true;
-        if(isMainPlayer && type == TileTypes.RedTile)
+        if(isMainPlayer && type == TileType.RedTile)
         {
             infoText.text = "You took " + value + " amount of damage!";
             Invoke("DisableInfoText", 2.5f);
         }
-        else if(!isMainPlayer && type == TileTypes.RedTile)
+        else if(!isMainPlayer && type == TileType.RedTile)
         {
             infoText.text = "The enemy took " + value + " amount of damage!";
             Invoke("DisableInfoText", 2.5f);
         }
-        else if(isMainPlayer && type == TileTypes.GreenTile)
+        else if(isMainPlayer && type == TileType.GreenTile)
         {
             infoText.text = "You gained " + value + " amount of health!";
             Invoke("DisableInfoText", 2.5f);
         }
-        else if(!isMainPlayer && type == TileTypes.GreenTile)
+        else if(!isMainPlayer && type == TileType.GreenTile)
         {
             infoText.text = "The enemy gained " + value + " amount of health!";
+            Invoke("DisableInfoText", 2.5f);
+        }
+        else if(type == TileType.BlueTile)
+        {
+            infoText.text = "Roll again!";
+            Invoke("DisableInfoText", 2.5f);
+        }else if(type == TileType.BlackTile)
+        {
+            infoText.text = "Time to battle!";
             Invoke("DisableInfoText", 2.5f);
         }
     }

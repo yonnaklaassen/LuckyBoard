@@ -10,6 +10,8 @@ TagManager:
   - Enemy
   - TeleportTile
   - RollButton
+  - RollAgainTile
+  - BattleTile
   layers:
   - Default
   - TransparentFX

@@ -18,10 +18,16 @@ public class Player : MonoBehaviour
     private bool isMoving = false;
     private bool isMainPlayer = false;
 
+    [HideInInspector]
+    public bool isBattling = false;
+
+    private int playerScore = 0;
+    private int rollCount = 3;
+
     [SerializeField]
     private int health = 0;
 
-    public delegate void UpdatePlayerInfoText(int value, TileTypes type, bool isMainPlayer, int health);
+    public delegate void UpdatePlayerInfoText(int value, TileType type, bool isMainPlayer, int health);
     public static event UpdatePlayerInfoText updatePlayerInfo;
 
     public delegate void DisplayRolledValue(int steps, bool isMainPlayer);
@@ -30,12 +36,18 @@ public class Player : MonoBehaviour
     public delegate void EndPlayerTurn(bool isMainPlayer);
     public static event EndPlayerTurn endPlayerTurn;
 
+    public delegate TileType GetTileType(string currentTile);
+    public static event GetTileType getTileType;
+
+    [HideInInspector]
     public AudioManager audioManager;
+
+    [HideInInspector]
     public Animator animator;
 
     private string[] playerDamagedSounds = { "OnPlayerDamaged", "OnPlayerDamaged2", "OnPlayerDamaged3" };
     private string[] happyPlayerSounds = { "OnPlayerHappy", "OnPlayerHappy2", "OnPlayerHappy3" };
-    private int[] turnLeftPositions = { 19, 36};
+    private int[] turnPositions = { 19, 36, 46, 60, 65, 78, 81};
 
     public void Awake()
     {
@@ -48,26 +60,41 @@ public class Player : MonoBehaviour
     }
     public void Roll(bool isMainPlayer)
     {
+        this.isMainPlayer = isMainPlayer;
         audioManager.Play("DiceRoll");
         int steps = Random.Range(1, 7);
 
         if (routePosition + steps < currentRoute.tiles.Count)
          {
-            StartCoroutine(Move(steps, isMainPlayer));
+            if (displayRolledValue != null)
+            {
+                displayRolledValue(steps, isMainPlayer);
+            }
+
+            if(!isBattling)
+            {
+                StartCoroutine(Move(steps, isMainPlayer));
+            }else
+            {
+                playerScore += steps;
+                rollCount--;
+                EndTurn();
+            }
          }
+
+        if(rollCount == 0)
+        {
+            playerScore = 0;
+            rollCount = 3;
+            //set isbattling in turncontroller to false
+        }
     }
 
-    public IEnumerator Move(int steps, bool isMainPlayer)
+    private IEnumerator Move(int steps, bool isMainPlayer)
     {
-        this.isMainPlayer = isMainPlayer;
         if (isMoving)
         {
             yield break;
-        }
-
-        if(displayRolledValue != null)
-        {
-            displayRolledValue(steps, isMainPlayer);
         }
 
         isMoving = true;
@@ -92,8 +119,14 @@ public class Player : MonoBehaviour
         }
 
         isMoving = false;
+
         var currentPos = currentRoute.tiles[routePosition].tag;
-        var wait = checkCurrentTile(currentPos, routePosition, isMainPlayer);
+        var currentTile = TileType.YellowTile;
+        if(getTileType != null)
+        {
+           currentTile = getTileType(currentPos);
+        }
+        var wait = checkCurrentTile(currentTile, routePosition, isMainPlayer);
 
         if(endPlayerTurn != null)
         {
@@ -119,26 +152,41 @@ public class Player : MonoBehaviour
         return nextTile != (transform.position = Vector3.MoveTowards(transform.position, nextTile, speed * Time.deltaTime));
     }
 
-    private bool checkCurrentTile(string currentPos, int routePosition, bool isMainPlayer)
+    private bool checkCurrentTile(TileType currentTile, int routePosition, bool isMainPlayer)
     {
         var wait = false;
-        if (currentPos.Equals("DamageTile"))
-        {
-            LoseHealth(isMainPlayer);
-            wait = true;
-        }
-        else if(currentPos.Equals("HealthTile"))
-        {
-            GainHealth(isMainPlayer);
-            wait = true;
 
-        }
-        else if(currentPos.Equals("TeleportTile"))
+        switch (currentTile)
         {
-            audioManager.Play("Teleport");
-            TeleportPlayer(routePosition);
-            wait = true;
-        }
+            case TileType.RedTile:
+                LoseHealth(isMainPlayer);
+                wait = true;
+                break;
+            case TileType.GreenTile:
+                GainHealth(isMainPlayer);
+                wait = true;
+                break;
+            case TileType.PurpleTile:
+                audioManager.Play("Teleport");
+                TeleportPlayer(routePosition);
+                wait = true;
+                break;
+            case TileType.BlueTile:
+                if (updatePlayerInfo != null)
+                {
+                    updatePlayerInfo(0, TileType.BlueTile, isMainPlayer, health);
+                }
+                this.isMainPlayer = !isMainPlayer;
+                break;
+            case TileType.BlackTile:
+                if (updatePlayerInfo != null)
+                {
+                    updatePlayerInfo(0, TileType.BlackTile, isMainPlayer, health);
+                }
+                this.isMainPlayer = !isMainPlayer;
+                FightOtherPlayer();
+                break;
+        } 
         return wait;
     }
 
@@ -176,20 +224,41 @@ public class Player : MonoBehaviour
         transform.position = teleportTo.position;
     }
 
+    private void FightOtherPlayer()
+    {   //todo set isbattling in turncontroller to true
+
+    }
+
 
     private void RotatePlayer(int routePosition)
     {
-        if(routePosition < turnLeftPositions[0])
-        {
-            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -90, transform.rotation.z));
-        }
-        else if(routePosition >= turnLeftPositions[0] && routePosition < turnLeftPositions[1])
+        if(routePosition >= turnPositions[0] && routePosition < turnPositions[1])
         {
             transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -180, transform.rotation.z));
         }
-        else if(routePosition >= turnLeftPositions[1])
+        else if(routePosition >= turnPositions[1] && routePosition < turnPositions[2])
         {
             transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -270, transform.rotation.z));
+        }
+        else if(routePosition >= turnPositions[2] && routePosition < turnPositions[3])
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -360, transform.rotation.z));
+        }
+        else if(routePosition >= turnPositions[3] && routePosition < turnPositions[4])
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -270, transform.rotation.z));
+        }
+        else if(routePosition >= turnPositions[4] && routePosition < turnPositions[5])
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -180, transform.rotation.z));
+        }
+        else if(routePosition >= turnPositions[5] && routePosition < turnPositions[6])
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -270, transform.rotation.z));
+        }
+        else if(routePosition >=turnPositions[6])
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -360, transform.rotation.z));
         }
     }
 
@@ -210,7 +279,7 @@ public class Player : MonoBehaviour
         audioManager.Play(playerDamagedSounds[Random.Range(0, 3)]);
         if (updatePlayerInfo != null)
         {
-            updatePlayerInfo(damage, TileTypes.RedTile, isMainPlayer, health);
+            updatePlayerInfo(damage, TileType.RedTile, isMainPlayer, health);
         }
     }
 
@@ -232,7 +301,7 @@ public class Player : MonoBehaviour
 
         if(updatePlayerInfo != null)
         {
-            updatePlayerInfo(healing, TileTypes.GreenTile, isMainPlayer, health);
+            updatePlayerInfo(healing, TileType.GreenTile, isMainPlayer, health);
         }
     }
 

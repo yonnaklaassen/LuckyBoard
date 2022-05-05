@@ -13,6 +13,8 @@ public class TurnController : MonoBehaviour
 
     private AudioManager audioManager;
 
+    private bool isBattling = false;
+
     private string[] mainPlayerTurnPhrases = {"OnMainPlayerTurn", "OnMainPlayerTurn2" };
 
     public delegate void SetRollButtonActive(bool active);
@@ -51,6 +53,21 @@ public class TurnController : MonoBehaviour
         {
             setMainCamera(!isMainPlayer);
         }
+
+        if(isBattling)
+        {
+            player.isBattling = true;
+            enemyPlayer.isBattling = true;
+        }else
+        {
+            player.isBattling = false;
+            enemyPlayer.isBattling = false;
+        }
+    }
+
+    private void setIsBattling(bool isBattling)
+    {
+        this.isBattling = isBattling;
     }
 
     private void OnEnable()
