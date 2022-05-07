@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class TurnController : MonoBehaviour
 {
     [SerializeField]
-    private MainPlayer player;
+    private MainPlayer mainPlayer;
 
     [SerializeField]
     private EnemyPlayer enemyPlayer;
@@ -32,14 +32,14 @@ public class TurnController : MonoBehaviour
     {
         if(isMainPlayer)
         {
-            player.animator.SetBool("IsTurn", false);
+            mainPlayer.animator.SetBool("IsTurn", false);
             enemyPlayer.animator.SetBool("IsTurn", true);
 
             enemyPlayer.Roll(false);
         }
         else
         {
-            player.animator.SetBool("IsTurn", true);
+            mainPlayer.animator.SetBool("IsTurn", true);
             enemyPlayer.animator.SetBool("IsTurn", false);
             audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);
         }
@@ -47,6 +47,7 @@ public class TurnController : MonoBehaviour
         if (setRollButton != null)
         {
             setRollButton(!isMainPlayer);
+            Debug.Log("Set roll button: " + !isMainPlayer);
         }
 
         if(setMainCamera != null)
@@ -56,16 +57,16 @@ public class TurnController : MonoBehaviour
 
         if(isBattling)
         {
-            player.isBattling = true;
-            enemyPlayer.isBattling = true;
+            mainPlayer.battleMode = true;
+            enemyPlayer.battleMode = true;
         }else
         {
-            player.isBattling = false;
-            enemyPlayer.isBattling = false;
+            mainPlayer.battleMode = false;
+            enemyPlayer.battleMode = false;
         }
     }
 
-    private void setIsBattling(bool isBattling)
+    private void SetIsBattling(bool isBattling)
     {
         this.isBattling = isBattling;
     }
@@ -73,11 +74,13 @@ public class TurnController : MonoBehaviour
     private void OnEnable()
     {
         Player.endPlayerTurn += EndTurn;
+        Player.setIsBattling += SetIsBattling;
     }
 
     private void OnDisable()
     {
         Player.endPlayerTurn -= EndTurn;
+        Player.setIsBattling -= SetIsBattling;
     }
 
 }

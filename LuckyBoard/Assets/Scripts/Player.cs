@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     private bool isMainPlayer = false;
 
     [HideInInspector]
-    public bool isBattling = false;
+    public bool battleMode = false;
 
     private int playerScore = 0;
     private int rollCount = 3;
@@ -36,8 +36,12 @@ public class Player : MonoBehaviour
     public delegate void EndPlayerTurn(bool isMainPlayer);
     public static event EndPlayerTurn endPlayerTurn;
 
+    public delegate void SetIsBattling(bool isBattling);
+    public static event SetIsBattling setIsBattling;
+
     public delegate TileType GetTileType(string currentTile);
     public static event GetTileType getTileType;
+
 
     [HideInInspector]
     public AudioManager audioManager;
@@ -71,7 +75,7 @@ public class Player : MonoBehaviour
                 displayRolledValue(steps, isMainPlayer);
             }
 
-            if(!isBattling)
+            if(!battleMode)
             {
                 StartCoroutine(Move(steps, isMainPlayer));
             }else
@@ -79,6 +83,7 @@ public class Player : MonoBehaviour
                 playerScore += steps;
                 rollCount--;
                 EndTurn();
+                Debug.Log("End turn of mainPlayer: " + isMainPlayer);
             }
          }
 
@@ -86,7 +91,11 @@ public class Player : MonoBehaviour
         {
             playerScore = 0;
             rollCount = 3;
-            //set isbattling in turncontroller to false
+            
+            if(setIsBattling != null)
+            {
+                setIsBattling(false);
+            }
         }
     }
 
@@ -225,8 +234,10 @@ public class Player : MonoBehaviour
     }
 
     private void FightOtherPlayer()
-    {   //todo set isbattling in turncontroller to true
-
+    {   if(setIsBattling != null)
+        {
+            setIsBattling(true);
+        }
     }
 
 

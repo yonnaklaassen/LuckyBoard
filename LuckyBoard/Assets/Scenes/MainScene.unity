@@ -3915,7 +3915,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &475509686
 Transform:
   m_ObjectHideFlags: 0
@@ -4826,6 +4826,7 @@ MonoBehaviour:
   currentRoute: {fileID: 33579795}
   speed: 3
   routePosition: 0
+  battleMode: 0
   health: 100
   audioManager: {fileID: 0}
   animator: {fileID: 605728034}
@@ -5113,6 +5114,7 @@ MonoBehaviour:
   currentRoute: {fileID: 33579795}
   speed: 3
   routePosition: 0
+  battleMode: 0
   health: 100
   audioManager: {fileID: 0}
   animator: {fileID: 664948319}
@@ -12772,7 +12774,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47378e7a29c694a4ebd58e70d2e72bba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 605728036}
+  mainPlayer: {fileID: 605728036}
   enemyPlayer: {fileID: 664948318}
 --- !u!4 &1406923815
 Transform:
@@ -14463,6 +14465,7 @@ MonoBehaviour:
   currentRoute: {fileID: 33579795}
   speed: 10
   routePosition: 0
+  battleMode: 0
   health: 0
   audioManager: {fileID: 317982040}
   animator: {fileID: 0}
