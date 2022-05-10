@@ -21,8 +21,8 @@ public class Player : MonoBehaviour
     [HideInInspector]
     public bool battleMode = false;
 
-    private int playerScore = 0;
-    private int rollCount = 3;
+    public int playerScore = 0;
+    public int rollCount = 3;
 
     [SerializeField]
     private int health = 0;
@@ -42,6 +42,11 @@ public class Player : MonoBehaviour
     public delegate TileType GetTileType(string currentTile);
     public static event GetTileType getTileType;
 
+    public delegate void DisplayBattleScores(bool isMainPlayer, int score);
+    public static event DisplayBattleScores displayBattleScores;
+
+    public delegate void UpdateBattleText(BattleStage stage, WinnerTypes winnerTypes);
+    public static event UpdateBattleText updateBattleText;
 
     [HideInInspector]
     public AudioManager audioManager;
@@ -67,7 +72,6 @@ public class Player : MonoBehaviour
         this.isMainPlayer = isMainPlayer;
         audioManager.Play("DiceRoll");
         int steps = Random.Range(1, 7);
-
         if (routePosition + steps < currentRoute.tiles.Count)
          {
             if (displayRolledValue != null)
@@ -78,25 +82,21 @@ public class Player : MonoBehaviour
             if(!battleMode)
             {
                 StartCoroutine(Move(steps, isMainPlayer));
-            }else
+
+            }
+            else
             {
                 playerScore += steps;
                 rollCount--;
-                EndTurn();
-                Debug.Log("End turn of mainPlayer: " + isMainPlayer);
+
+                if(displayBattleScores != null)
+                {
+                    displayBattleScores(isMainPlayer, playerScore);
+                }
+
+                Invoke("EndTurn", 2.5f);
             }
          }
-
-        if(rollCount == 0)
-        {
-            playerScore = 0;
-            rollCount = 3;
-            
-            if(setIsBattling != null)
-            {
-                setIsBattling(false);
-            }
-        }
     }
 
     private IEnumerator Move(int steps, bool isMainPlayer)
@@ -130,11 +130,7 @@ public class Player : MonoBehaviour
         isMoving = false;
 
         var currentPos = currentRoute.tiles[routePosition].tag;
-        var currentTile = TileType.YellowTile;
-        if(getTileType != null)
-        {
-           currentTile = getTileType(currentPos);
-        }
+        var currentTile = getTileType != null ? getTileType(currentPos) : TileType.YellowTile;
         var wait = checkCurrentTile(currentTile, routePosition, isMainPlayer);
 
         if(endPlayerTurn != null)
@@ -168,7 +164,7 @@ public class Player : MonoBehaviour
         switch (currentTile)
         {
             case TileType.RedTile:
-                LoseHealth(isMainPlayer);
+                LoseHealth(isMainPlayer, false);
                 wait = true;
                 break;
             case TileType.GreenTile:
@@ -188,12 +184,7 @@ public class Player : MonoBehaviour
                 this.isMainPlayer = !isMainPlayer;
                 break;
             case TileType.BlackTile:
-                if (updatePlayerInfo != null)
-                {
-                    updatePlayerInfo(0, TileType.BlackTile, isMainPlayer, health);
-                }
-                this.isMainPlayer = !isMainPlayer;
-                FightOtherPlayer();
+                StartBattle();
                 break;
         } 
         return wait;
@@ -233,13 +224,20 @@ public class Player : MonoBehaviour
         transform.position = teleportTo.position;
     }
 
-    private void FightOtherPlayer()
-    {   if(setIsBattling != null)
+    private void StartBattle()
+    {
+        if (updateBattleText != null)
+        {
+            updateBattleText(BattleStage.Start, WinnerTypes.None);
+        }
+
+        this.isMainPlayer = !isMainPlayer;
+
+        if (setIsBattling != null)
         {
             setIsBattling(true);
         }
     }
-
 
     private void RotatePlayer(int routePosition)
     {
@@ -273,9 +271,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void LoseHealth(bool isMainPlayer)
+    public void LoseHealth(bool isMainPlayer, bool isBattle)
     {
-        int damage = Random.Range(1, 11);
+        int damage = isBattle ? Random.Range(5, 25) : Random.Range(1, 11);
         audioManager.Play("Punch");
         if ((health - damage) < 0)
         {
@@ -314,6 +312,22 @@ public class Player : MonoBehaviour
         {
             updatePlayerInfo(healing, TileType.GreenTile, isMainPlayer, health);
         }
+    }
+
+    public void SetBattleMode(bool active)
+    {
+        battleMode = active;
+    }
+
+    public int GetPlayerScore()
+    {
+        return playerScore;
+    }
+
+    public void ResetScore()
+    {
+        playerScore = 0;
+        rollCount = 3;
     }
 
 }

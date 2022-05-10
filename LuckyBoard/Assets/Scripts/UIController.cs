@@ -19,7 +19,16 @@ public class UIController : MonoBehaviour
     private TextMeshProUGUI enemyHealthValue;
 
     [SerializeField]
+    private TextMeshProUGUI playerBattleScore;
+
+    [SerializeField]
+    private TextMeshProUGUI enemyBattleScore;
+
+    [SerializeField]
     private TextMeshProUGUI infoText;
+
+    [SerializeField]
+    private TextMeshProUGUI battleText;
 
     private GameObject rollButtonObject;
 
@@ -40,7 +49,10 @@ public class UIController : MonoBehaviour
     }
 
     void Start()
-    {
+    {   
+        DisableBattleText();
+        DisableInfoText();
+        DisableBattleScores();
         playerHealthBar.value = startHealth;
         enemyHealthBar.value = startHealth;
 
@@ -51,6 +63,7 @@ public class UIController : MonoBehaviour
             if (rolled != null)
             {
                 rolled();
+                SetRollButton(false);
             }
         });
     }
@@ -83,10 +96,27 @@ public class UIController : MonoBehaviour
         {
             infoText.text = "Roll again!";
             Invoke("DisableInfoText", 2.5f);
-        }else if(type == TileType.BlackTile)
+        }
+    }
+
+    private void UpdateBattleText(BattleStage stage, WinnerTypes winnerTypes)
+    {
+        battleText.enabled = true;
+
+        switch(stage)
         {
-            infoText.text = "Time to battle!";
-            Invoke("DisableInfoText", 2.5f);
+            case BattleStage.Start:
+                battleText.text = "The battle begins!";
+                Invoke("DisableBattleText", 2.5f);
+                break;
+            case BattleStage.Winner:
+                battleText.text = winnerTypes == WinnerTypes.MainPlayer ? "You are the winner!" : "The enmy wins!";
+                Invoke("DisableBattleText", 3f);
+                break;
+            case BattleStage.Tie:
+                battleText.text = "It's a tie, no one is punished";
+                Invoke("DisableBattleText", 3f);
+                break;
         }
     }
 
@@ -104,9 +134,9 @@ public class UIController : MonoBehaviour
         }
     }
 
-    public void DisplayRolledValue(int rollValue, bool isMainPlayer)
+    private void DisplayRolledValue(int rollValue, bool isMainPlayer)
     {
-        if (isMainPlayer)
+         if (isMainPlayer)
         {
             rollValueText.text = "You rolled: " + rollValue.ToString();
         }
@@ -116,9 +146,34 @@ public class UIController : MonoBehaviour
         }
     }
 
+    private void DisplayScore(bool isMainPlayer, int score)
+    {
+        enemyBattleScore.enabled = true;
+        playerBattleScore.enabled = true;
+        if (isMainPlayer)
+        {
+            playerBattleScore.text = "Your score: " + score.ToString();
+        }
+        else
+        {
+            enemyBattleScore.text = "Enemy score: " + score.ToString();
+        }
+    }
+
     private void DisableInfoText()
     {
         infoText.enabled = false;
+    }
+
+    private void DisableBattleText()
+    {
+        battleText.enabled = false;
+    }
+
+    private void DisableBattleScores()
+    {
+        enemyBattleScore.enabled = false;
+        playerBattleScore.enabled = false;
     }
 
     public void SetRollButton(bool active)
@@ -131,6 +186,10 @@ public class UIController : MonoBehaviour
         TurnController.setRollButton += SetRollButton;
         Player.updatePlayerInfo += UpdateInfoText;
         Player.displayRolledValue += DisplayRolledValue;
+        TurnController.disableBattleScores += DisableBattleScores;
+        Player.displayBattleScores += DisplayScore;
+        Player.updateBattleText += UpdateBattleText;
+        TurnController.updateBattleText += UpdateBattleText;
     }
 
     private void OnDisable()
@@ -138,5 +197,9 @@ public class UIController : MonoBehaviour
         TurnController.setRollButton -= SetRollButton;
         Player.updatePlayerInfo -= UpdateInfoText;
         Player.displayRolledValue -= DisplayRolledValue;
+        TurnController.disableBattleScores -= DisableBattleScores;
+        Player.displayBattleScores -= DisplayScore;
+        Player.updateBattleText -= UpdateBattleText;
+        TurnController.updateBattleText -= UpdateBattleText;
     }
 }
