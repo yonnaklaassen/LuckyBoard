@@ -29,7 +29,7 @@ public class UIController : MonoBehaviour
     private TextMeshProUGUI infoText;
 
     [SerializeField]
-    private TextMeshProUGUI battleText;
+    private TextMeshProUGUI gameText;
 
     private GameObject rollButtonObject;
 
@@ -51,7 +51,7 @@ public class UIController : MonoBehaviour
 
     void Start()
     {   
-        DisableBattleText();
+        DisableGameText();
         DisableInfoText();
         DisableBattleScores();
         playerHealthBar.value = startHealth;
@@ -102,29 +102,27 @@ public class UIController : MonoBehaviour
 
     private void UpdateBattleText(BattleStage stage, WinnerTypes winnerTypes)
     {
-        battleText.enabled = true;
+        gameText.enabled = true;
 
         switch(stage)
         {
             case BattleStage.Start:
-                battleText.text = "The battle begins!";
-                Invoke("DisableBattleText", 2.5f);
+                gameText.text = "The battle begins!";
+                Invoke("DisableGameText", 2.5f);
                 break;
             case BattleStage.Winner:
-                battleText.text = winnerTypes == WinnerTypes.MainPlayer ? "You are the winner!" : "The enmy wins!";
-                Invoke("DisableBattleText", 3f);
+                gameText.text = winnerTypes == WinnerTypes.MainPlayer ? "You are the winner!" : "The enmy wins!";
+                Invoke("DisableGameText", 3f);
                 break;
             case BattleStage.Tie:
-                battleText.text = "It's a tie, no one is punished";
-                Invoke("DisableBattleText", 3f);
+                gameText.text = "It's a tie, no one is punished";
+                Invoke("DisableGameText", 3f);
                 break;
         }
     }
 
     private void UpdateHealthStats(bool isMainPlayer, int health)
     {
-        if(health != 0)
-        {
             if (isMainPlayer)
             {
                 playerHealthBar.value = health;
@@ -135,20 +133,22 @@ public class UIController : MonoBehaviour
                 enemyHealthBar.value = health;
                 enemyHealthValue.text = health.ToString();
             }
+    }
+
+    private void DisplayWinner(bool isMainPlayer)
+    {
+        rollValueText.enabled = false;
+        gameText.enabled = true;
+
+        if (isMainPlayer)
+        {
+            gameText.text = "Game over! You lost";
+            Invoke("QuitGame", 5.2f);
         }
         else
         {
-            infoText.enabled = true;
-            if (isMainPlayer)
-            {
-                infoText.text = "Game over! You lost";
-                Invoke("QuitGame", 6f);
-            }
-            else
-            {
-                infoText.text = "You won!";
-                Invoke("QuitGame", 6f);
-            }
+            gameText.text = "You won!";
+            Invoke("QuitGame", 10.5f);
         }
     }
 
@@ -189,9 +189,9 @@ public class UIController : MonoBehaviour
         infoText.enabled = false;
     }
 
-    private void DisableBattleText()
+    private void DisableGameText()
     {
-        battleText.enabled = false;
+        gameText.enabled = false;
     }
 
     private void DisableBattleScores()
@@ -214,6 +214,7 @@ public class UIController : MonoBehaviour
         Player.displayBattleScores += DisplayScore;
         Player.updateBattleText += UpdateBattleText;
         TurnController.updateBattleText += UpdateBattleText;
+        TurnController.endGame += DisplayWinner;
     }
 
     private void OnDisable()
@@ -225,5 +226,6 @@ public class UIController : MonoBehaviour
         Player.displayBattleScores -= DisplayScore;
         Player.updateBattleText -= UpdateBattleText;
         TurnController.updateBattleText -= UpdateBattleText;
+        TurnController.endGame -= DisplayWinner;
     }
 }

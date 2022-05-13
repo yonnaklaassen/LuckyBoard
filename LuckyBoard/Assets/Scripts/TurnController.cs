@@ -13,6 +13,8 @@ public class TurnController : MonoBehaviour
 
     private AudioManager audioManager;
 
+    private bool gameRunning = false;
+
     private string[] mainPlayerTurnPhrases = {"OnMainPlayerTurn", "OnMainPlayerTurn2" };
 
     public delegate void SetRollButtonActive(bool active);
@@ -27,14 +29,22 @@ public class TurnController : MonoBehaviour
     public delegate void UpdateBattleText(BattleStage stage, WinnerTypes winnerTypes);
     public static event UpdateBattleText updateBattleText;
 
+    public delegate void EndGame(bool isMainPlayer);
+    public static event EndGame endGame;
+
     private void Awake()
     {
         audioManager = FindObjectOfType<AudioManager>();
     }
 
+    private void Start()
+    {
+        gameRunning = true;
+    }
+
     private void EndTurn(bool isMainPlayer)
     {
-        if(mainPlayer.GetPlayerHealth() != 0 || enemyPlayer.GetPlayerHealth() != 0)
+        if (gameRunning)
         {
             if (setRollButton != null)
             {
@@ -63,6 +73,36 @@ public class TurnController : MonoBehaviour
                 mainPlayer.animator.SetBool("IsTurn", true);
                 enemyPlayer.animator.SetBool("IsTurn", false);
                 audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);
+            }
+        }
+        else
+        {
+            GameFinished();
+        }
+    }
+
+    private void GameFinished()
+    {
+        if (endGame != null)
+        {
+            bool isMainPlayerWinner = mainPlayer.GetPlayerHealth() == 0 ? false : true;
+            if (isMainPlayerWinner)
+            {
+                audioManager.Play("FinalWin");
+            }
+            else
+            {
+                audioManager.Play("FinalLose");
+            }
+
+            if (setMainCamera != null)
+            {
+                setMainCamera(isMainPlayerWinner);
+            }
+
+            if (endGame != null)
+            {
+                endGame(!isMainPlayerWinner);
             }
         }
     }
@@ -123,6 +163,11 @@ public class TurnController : MonoBehaviour
         enemyPlayer.ResetScore();
     }
 
+    private void GameEnd()
+    {
+        gameRunning = false;
+    }
+
     private void PunishMainPlayer()
     {
         enemyPlayer.LoseHealth(false, true);
@@ -137,12 +182,14 @@ public class TurnController : MonoBehaviour
     {
         Player.endPlayerTurn += EndTurn;
         Player.setIsBattling += SetIsBattling;
+        Player.endGame += GameEnd;
     }
 
     private void OnDisable()
     {
         Player.endPlayerTurn -= EndTurn;
         Player.setIsBattling -= SetIsBattling;
+        Player.endGame -= GameEnd;
     }
 
 }

@@ -48,6 +48,9 @@ public class Player : MonoBehaviour
     public delegate void UpdateBattleText(BattleStage stage, WinnerTypes winnerTypes);
     public static event UpdateBattleText updateBattleText;
 
+    public delegate void EndGame();
+    public static event EndGame endGame;
+
     [HideInInspector]
     public AudioManager audioManager;
 
@@ -271,6 +274,11 @@ public class Player : MonoBehaviour
         if ((health - damage) < 0)
         {
             health = 0;
+
+            if(endGame != null)
+            {
+                endGame();
+            }
         }
         else
         {
