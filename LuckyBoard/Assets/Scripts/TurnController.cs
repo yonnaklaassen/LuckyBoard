@@ -34,33 +34,36 @@ public class TurnController : MonoBehaviour
 
     private void EndTurn(bool isMainPlayer)
     {
-        if (setRollButton != null)
-        { 
-            setRollButton(!isMainPlayer);
-        }
-
-        if(setMainCamera != null)
+        if(mainPlayer.GetPlayerHealth() != 0 || enemyPlayer.GetPlayerHealth() != 0)
         {
-            setMainCamera(!isMainPlayer);
-        }
+            if (setRollButton != null)
+            {
+                setRollButton(!isMainPlayer);
+            }
 
-        if (mainPlayer.rollCount == 0 && enemyPlayer.rollCount == 0)
-        {
-            SetIsBattling(false);
-        }
+            if (setMainCamera != null)
+            {
+                setMainCamera(!isMainPlayer);
+            }
 
-        if (isMainPlayer)
-        {
-            mainPlayer.animator.SetBool("IsTurn", false);
-            enemyPlayer.animator.SetBool("IsTurn", true);
+            if (mainPlayer.rollCount == 0 && enemyPlayer.rollCount == 0)
+            {
+                SetIsBattling(false);
+            }
 
-            enemyPlayer.Roll(false);
-        }
-        else
-        {
-            mainPlayer.animator.SetBool("IsTurn", true);
-            enemyPlayer.animator.SetBool("IsTurn", false);
-            audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);
+            if (isMainPlayer)
+            {
+                mainPlayer.animator.SetBool("IsTurn", false);
+                enemyPlayer.animator.SetBool("IsTurn", true);
+
+                enemyPlayer.Roll(false);
+            }
+            else
+            {
+                mainPlayer.animator.SetBool("IsTurn", true);
+                enemyPlayer.animator.SetBool("IsTurn", false);
+                audioManager.Play(mainPlayerTurnPhrases[Random.Range(0, 2)]);
+            }
         }
     }
 
@@ -76,7 +79,7 @@ public class TurnController : MonoBehaviour
         {
             enemyPlayer.SetBattleMode(false);
             mainPlayer.SetBattleMode(false);
-
+            
             CheckBattleWinner();
 
             Invoke("DisableScores", 3f);

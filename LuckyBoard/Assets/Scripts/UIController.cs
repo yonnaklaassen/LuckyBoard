@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIController : MonoBehaviour
 {
@@ -122,15 +123,32 @@ public class UIController : MonoBehaviour
 
     private void UpdateHealthStats(bool isMainPlayer, int health)
     {
-        if(isMainPlayer)
+        if(health != 0)
         {
-            playerHealthBar.value = health;
-            playerHealthValue.text = health.ToString();
+            if (isMainPlayer)
+            {
+                playerHealthBar.value = health;
+                playerHealthValue.text = health.ToString();
+            }
+            else
+            {
+                enemyHealthBar.value = health;
+                enemyHealthValue.text = health.ToString();
+            }
         }
         else
         {
-            enemyHealthBar.value = health;
-            enemyHealthValue.text = health.ToString();
+            infoText.enabled = true;
+            if (isMainPlayer)
+            {
+                infoText.text = "Game over! You lost";
+                Invoke("QuitGame", 6f);
+            }
+            else
+            {
+                infoText.text = "You won!";
+                Invoke("QuitGame", 6f);
+            }
         }
     }
 
@@ -153,11 +171,17 @@ public class UIController : MonoBehaviour
         if (isMainPlayer)
         {
             playerBattleScore.text = "Your score: " + score.ToString();
+
         }
         else
         {
             enemyBattleScore.text = "Enemy score: " + score.ToString();
         }
+    }
+
+    private void QuitGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex -1);
     }
 
     private void DisableInfoText()

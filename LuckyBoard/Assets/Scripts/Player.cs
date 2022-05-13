@@ -25,7 +25,7 @@ public class Player : MonoBehaviour
     public int rollCount = 3;
 
     [SerializeField]
-    private int health = 0;
+    private int health = 100;
 
     public delegate void UpdatePlayerInfoText(int value, TileType type, bool isMainPlayer, int health);
     public static event UpdatePlayerInfoText updatePlayerInfo;
@@ -72,8 +72,6 @@ public class Player : MonoBehaviour
         this.isMainPlayer = isMainPlayer;
         audioManager.Play("DiceRoll");
         int steps = Random.Range(1, 7);
-        if (routePosition + steps < currentRoute.tiles.Count)
-         {
             if (displayRolledValue != null)
             {
                 displayRolledValue(steps, isMainPlayer);
@@ -96,7 +94,6 @@ public class Player : MonoBehaviour
 
                 Invoke("EndTurn", 2.5f);
             }
-         }
     }
 
     private IEnumerator Move(int steps, bool isMainPlayer)
@@ -192,7 +189,8 @@ public class Player : MonoBehaviour
 
     private void TeleportPlayer(int routePosition)
     {
-        var nextTeleportTile = currentRoute.tiles.GetRange(routePosition + 1, currentRoute.tiles.Count - routePosition - 1).Find(t => t.tag.Equals("TeleportTile"));
+        var nextTeleportTile = currentRoute.tiles.GetRange(routePosition + 1, currentRoute.tiles.Count - routePosition - 1)
+                                                    .Find(t => t.tag.Equals("TeleportTile"));
         var tilesBeforeCurrentPos = currentRoute.tiles.GetRange(0, routePosition);
 
         tilesBeforeCurrentPos.Reverse();
@@ -203,20 +201,14 @@ public class Player : MonoBehaviour
         {
             Transform[] options = { lastTeleportTile, nextTeleportTile };
             teleportTo = options[Random.Range(0, 2)];
-
-            Debug.Log("Teleport to tile: " + teleportTo);
         }
         else if (lastTeleportTile != null && nextTeleportTile == null)
         {
             teleportTo = lastTeleportTile;
-
-            Debug.Log("Teleport to lastTile: " + teleportTo);
         }
         else if (lastTeleportTile == null && nextTeleportTile != null)
         {
             teleportTo = nextTeleportTile;
-
-            Debug.Log("Teleport to nextTile: " + teleportTo);
         }
 
         var newPosition = currentRoute.tiles.FindIndex(t => t == teleportTo);
@@ -273,7 +265,8 @@ public class Player : MonoBehaviour
 
     public void LoseHealth(bool isMainPlayer, bool isBattle)
     {
-        int damage = isBattle ? Random.Range(5, 25) : Random.Range(1, 11);
+        //int damage = isBattle ? Random.Range(25, 40) : Random.Range(5, 20);
+        int damage = 200;
         audioManager.Play("Punch");
         if ((health - damage) < 0)
         {
@@ -322,6 +315,11 @@ public class Player : MonoBehaviour
     public int GetPlayerScore()
     {
         return playerScore;
+    }
+
+    public int GetPlayerHealth()
+    {
+        return health;
     }
 
     public void ResetScore()

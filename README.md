@@ -14,6 +14,10 @@ https://assetstore.unity.com/packages/2d/textures-materials/sky/fantasy-skybox-f
 Lowpoly Environment - Nature pack:
 https://assetstore.unity.com/packages/3d/environments/lowpoly-environment-nature-pack-free-187052
 
+Lowpoly Nature & Village Pack:
+https://assetstore.unity.com/packages/3d/environments/lowpoly-nature-village-pack-165318
+
+
 
 Tutorials used:
 
