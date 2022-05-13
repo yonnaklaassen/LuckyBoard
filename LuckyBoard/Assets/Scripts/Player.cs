@@ -268,8 +268,7 @@ public class Player : MonoBehaviour
 
     public void LoseHealth(bool isMainPlayer, bool isBattle)
     {
-        //int damage = isBattle ? Random.Range(25, 40) : Random.Range(5, 20);
-        int damage = 200;
+        int damage = isBattle ? Random.Range(25, 40) : Random.Range(5, 20);
         audioManager.Play("Punch");
         if ((health - damage) < 0)
         {
