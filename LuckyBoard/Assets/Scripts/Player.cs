@@ -59,7 +59,7 @@ public class Player : MonoBehaviour
 
     private string[] playerDamagedSounds = { "OnPlayerDamaged", "OnPlayerDamaged2", "OnPlayerDamaged3" };
     private string[] happyPlayerSounds = { "OnPlayerHappy", "OnPlayerHappy2", "OnPlayerHappy3" };
-    private int[] turnPositions = { 19, 36, 46, 60, 65, 78, 81};
+    private int[] turnPositions = { 19, 36, 46, 60, 65, 78, 81, 0};
 
     public void Awake()
     {
@@ -115,8 +115,16 @@ public class Player : MonoBehaviour
             animator.Play("Jump", -1, 0f);
 
             RotatePlayer(routePosition);
-            Vector3 nextPos = currentRoute.tiles[routePosition + 1].position;
 
+            Vector3 nextPos;
+            if(routePosition == 97)
+            {
+                nextPos = currentRoute.tiles[0].position;
+                routePosition = -1;
+            }else
+            {
+                nextPos = currentRoute.tiles[routePosition + 1].position;
+            }
             while (MoveToNextTile(nextPos))
             {
                 yield return null;
@@ -264,11 +272,15 @@ public class Player : MonoBehaviour
         {
             transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -360, transform.rotation.z));
         }
+        else if(routePosition >= turnPositions[7] && routePosition < turnPositions[0])
+        {
+            transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x, -90, transform.rotation.z));
+        }
     }
 
     public void LoseHealth(bool isMainPlayer, bool isBattle)
     {
-        int damage = isBattle ? Random.Range(25, 40) : Random.Range(5, 20);
+        int damage = isBattle ? Random.Range(20, 35) : Random.Range(5, 15);
         audioManager.Play("Punch");
         if ((health - damage) < 0)
         {
@@ -294,7 +306,7 @@ public class Player : MonoBehaviour
 
     private void GainHealth(bool isMainPlayer)
     {
-        int healing = Random.Range(1, 11);
+        int healing = Random.Range(5, 15);
         audioManager.Play("Heal");
         if ((health + healing) > 100)
         {
