@@ -12,6 +12,7 @@ TagManager:
   - RollButton
   - RollAgainTile
   - BattleTile
+  - VolumeSlider
   layers:
   - Default
   - TransparentFX
