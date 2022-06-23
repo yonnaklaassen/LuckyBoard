@@ -1,8 +1,4 @@
 # LuckyBoard
-
-Gameplay Demo Video:
-https://youtu.be/39waA9VtyGQ
-
 Third party assets:
 
 Unity Chan:
